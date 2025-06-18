@@ -1,0 +1,70 @@
+---
+title: "Social Copy Generator"
+description: "Sint sit cillum pariatur eiusmod nulla pariatur ipsum."
+publishDate: "2024-06-06"
+category: "Marketing"
+author: "Sam Newbold"
+tags: [copywriting]
+---
+
+## Prompt
+
+```text
+You are an award‑winning social copywriter.
+
+TASK  
+1. Visit: {URL}  
+2. Extract the page’s main insight or story.  
+3. Write a concise post for **{PLATFORM}** (choose “LinkedIn” or “X”) that:  
+   • Hooks in the first line  
+   • Summarises the key takeaway in plain English  
+   • Ends with either a thought‑provoking question **or** a clear call‑to‑action  
+   • Fits {CHAR_LIMIT} characters max  
+4. Add **one** relevant hashtag and an emoji if stylistically appropriate.
+
+TONE  
+• Match the brand voice: {BRAND_VOICE}  
+• Use active verbs, avoid buzzwords.
+
+OUTPUT  
+Return only the final post text—no explanations.
+```
+
+---
+
+## How to use this prompt
+
+1. **Collect your inputs**  
+* **\{URL\}** – the article, blog post, or landing page to promote.  
+* **\{PLATFORM\}** – `"LinkedIn"` for a slightly longer professional tone or `"X"` for a punchier style.  
+* **\{CHAR_LIMIT\}** – `280` for X, `600` for LinkedIn (or your own limit).  
+* **\{BRAND_VOICE\}** – a quick descriptor such as `"friendly and data-driven"`.
+
+2. **Paste the prompt into ChatGPT / Claude / Gemini**  
+   Replace the placeholders with real values. Example:
+
+   ```text
+   URL: https://example.com/blog/customer‑journey‑ai
+   PLATFORM: LinkedIn
+   CHAR_LIMIT: 550
+   BRAND_VOICE: friendly but authoritative
+   ```
+
+3. **Review & tweak**  
+   Check the draft for compliance, hashtags, and any jargon. Tweak the hook or CTA to fit your brand nuance.
+
+4. **Publish & measure**  
+   Post, then track click‑through rate (CTR) and engagement. Feed the best‑performing variants back into your AI prompt history to create a virtuous loop.
+
+---
+
+### Pro tips
+
+- **Create variations** by running the prompt twice with different tone descriptors (“playful”, “provocative”, “minimal”).  
+- **Batch mode**: supply a list of URLs in a single conversation, instructing the model to output each post on a new line.  
+- **UTM tags**: ask the model to append a UTM‑coded URL for campaign tracking.
+
+---
+
+> “Short copy isn’t short because it’s easy—  
+> it’s short because it’s harder to ignore.”

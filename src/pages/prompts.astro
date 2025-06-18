@@ -1,0 +1,183 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Container from "@/components/container.astro";
+import Sectionhead from "@/components/sectionhead.astro";
+
+// Fetch prompt entries, honour optional draft flag and publishDate if present
+const publishedPrompts = await getCollection("prompt", ({ data }) => {
+  const notDraft   = !data.draft;
+  const dateIsPast = data.publishDate ? data.publishDate < new Date() : true;
+  return notDraft && dateIsPast;
+});
+
+// Sort newest first if publishDate exists
+publishedPrompts.sort((a, b) => {
+  const aDate = a.data.publishDate ?? new Date(0);
+  const bDate = b.data.publishDate ?? new Date(0);
+  return bDate.valueOf() - aDate.valueOf();
+});
+
+// Collect unique tag categories
+const categories = [
+  ...new Set(
+    publishedPrompts.flatMap((entry) => entry.data.tags ?? ["General"])
+  ),
+];
+---
+
+<Layout title="Prompt Library">
+  <Container>
+    <Sectionhead>
+      <Fragment slot="title">AI Prompt Library</Fragment>
+      <Fragment slot="desc">
+        Curated and ready‑to‑use prompts for marketers and business owners.
+      </Fragment>
+    </Sectionhead>
+
+    <!-- Filter controls -->
+    <div
+      class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mt-12 max-w-7xl mx-auto"
+    >
+      <input
+        id="search"
+        type="text"
+        placeholder="Search prompts..."
+        class="border px-4 py-2 rounded w-full md:w-1/2"
+      />
+
+      <select id="category" class="border px-4 py-2 rounded capitalize w-full md:w-auto">
+        <option value="all">All Categories</option>
+        {categories.map((cat) => (
+          <option value={cat}>{cat}</option>
+        ))}
+      </select>
+    </div>
+
+    <!-- Prompt cards -->
+    <main class="mt-16">
+      <ul
+        class="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-7xl mx-auto"
+      >
+        {publishedPrompts.map((entry) => (
+          <li
+            data-post
+            data-title={entry.data.title.toLowerCase()}
+            data-category={(entry.data.tags?.[0] ?? "General")}
+          >
+            <a href={`/prompt/${entry.slug}/`}>
+              <div class="border rounded-lg p-6 h-full flex flex-col hover:shadow">
+                <span
+                  class="text-red-600 uppercase tracking-wider text-xs font-medium"
+                >
+                  {(entry.data.tags?.[0] ?? "General")}
+                </span>
+
+                <h2
+                  class="text-lg font-semibold leading-snug tracking-tight mt-2"
+                >
+                  {entry.data.title}
+                </h2>
+
+                <p class="text-sm text-gray-600 mt-3 flex-1">
+                  {entry.data.description}
+                </p>
+
+                {entry.data.publishDate && (
+                  <time
+                    class="text-gray-400 text-xs mt-4 block"
+                    datetime={entry.data.publishDate.toISOString()}
+                  >
+                    {entry.data.publishDate.toDateString()}
+                  </time>
+                )}
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <!-- Pagination (client‑side) -->
+      <div
+        id="pagination"
+        class="flex justify-center gap-4 mt-12 text-sm text-gray-500"
+      >
+        <button
+          id="prev"
+          class="px-4 py-2 border rounded disabled:opacity-50"
+          disabled
+        >
+          ← Prev
+        </button>
+        <button
+          id="next"
+          class="px-4 py-2 border rounded disabled:opacity-50"
+        >
+          Next →
+        </button>
+      </div>
+    </main>
+  </Container>
+
+  <!-- Client‑side search, category filter, pagination (same JS as blog) -->
+  <script is:inline>
+    const searchInput   = document.getElementById("search");
+    const categorySelect = document.getElementById("category");
+    const posts         = Array.from(document.querySelectorAll("[data-post]"));
+    const prevBtn       = document.getElementById("prev");
+    const nextBtn       = document.getElementById("next");
+
+    const PER_PAGE = 8;
+    let currentPage = 1;
+
+    function getFilteredPosts() {
+      const query = searchInput.value.toLowerCase();
+      const cat   = categorySelect.value;
+      return posts.filter((item) => {
+        const title    = item.getAttribute("data-title");
+        const category = item.getAttribute("data-category");
+        const matchesQuery = title.includes(query);
+        const matchesCat   = cat === "all" || category === cat;
+        return matchesQuery && matchesCat;
+      });
+    }
+
+    function render() {
+      const visiblePosts = getFilteredPosts();
+      const totalPages   = Math.max(1, Math.ceil(visiblePosts.length / PER_PAGE));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      posts.forEach((p) => (p.style.display = "none"));
+      const start = (currentPage - 1) * PER_PAGE;
+      visiblePosts.slice(start, start + PER_PAGE).forEach((p) => (p.style.display = ""));
+
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages;
+    }
+
+    searchInput.addEventListener("input", () => {
+      currentPage = 1;
+      render();
+    });
+    categorySelect.addEventListener("change", () => {
+      currentPage = 1;
+      render();
+    });
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        render();
+      }
+    });
+    nextBtn.addEventListener("click", () => {
+      const visible = getFilteredPosts();
+      const total   = Math.ceil(visible.length / PER_PAGE);
+      if (currentPage < total) {
+        currentPage++;
+        render();
+      }
+    });
+
+    render();
+  </script>
+</Layout>

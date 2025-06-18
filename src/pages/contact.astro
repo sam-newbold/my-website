@@ -1,0 +1,43 @@
+---
+import Contactform from "@/components/contactform.astro";
+import Container from "@/components/container.astro";
+import Sectionhead from "@/components/sectionhead.astro";
+import Layout from "@/layouts/Layout.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<Layout title="Contact">
+  <Container>
+    <Sectionhead>
+      <Fragment slot="title">Contact</Fragment>
+      <Fragment slot="desc">Have a question? I'm happy to help!</Fragment>
+    </Sectionhead>
+    
+    <div class="grid md:grid-cols-2 gap-10 mx-auto max-w-4xl mt-20">
+      <div>
+        <h2 class="font-medium text-2xl text-gray-800">Contact Sam Newbold</h2>
+        <p class="text-lg leading-relaxed text-slate-500 mt-3">
+          Fill up the form, send me an email<br>or give me a call.
+        </p>
+        <div class="mt-5">
+          <div class="flex items-center mt-2 space-x-2 text-gray-600">
+            <Icon class="text-gray-400 w-4 h-4" name="uil:map-marker" />
+            <span>Christchurch, New Zealand</span>
+          </div><div class="flex items-center mt-2 space-x-2 text-gray-600">
+            <Icon class="text-gray-400 w-4 h-4" name="uil:envelope" /><a
+              href="mailto:sam@newbold.nz"
+              >sam@newbold.nz</a
+            >
+          </div><div class="flex items-center mt-2 space-x-2 text-gray-600">
+            <Icon class="text-gray-400 w-4 h-4" name="uil:phone" /><a
+              href="tel:+64274055308">027 405 5308</a
+            >
+          </div>
+        </div>
+      </div>
+      <div>
+        <Contactform />
+      </div>
+    </div>
+  </Container>
+</Layout>

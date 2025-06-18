@@ -1,0 +1,183 @@
+---
+import { SEO } from "astro-seo";
+import Footer from "@/components/footer.astro";
+import Navbar from "@/components/navbar/navbar.astro";
+import "@fontsource-variable/inter/index.css";
+import "@fontsource-variable/bricolage-grotesque";
+import "../styles/global.css";
+import { Schema as SchemaLD } from "astro-seo-schema";
+
+export interface Props {
+  title: string;
+  schema?: any;
+}
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+
+const resolvedImageWithDomain = new URL(
+  "/opengraph.jpg",
+  Astro.site
+).toString();
+
+const { title, schema } = Astro.props;
+
+const makeTitle = title
+  ? title + " | " + "Sam Newbold"
+  : "AI & Digital Marketing Blog & Tools | Sam Newbold";
+
+const pageTypeMap: Record<string, string> = {
+  "/": "WebSite",
+  "/about": "AboutPage",
+  "/contact": "ContactPage",
+};
+
+const webProfiles = [
+  "https://www.facebook.com/sam.newbold.18/",
+  "https://www.instagram.com/sam.newbold",
+  "https://www.linkedin.com/in/sam-newbold-619945188/",
+  "https://www.youtube.com/@samnewbold",
+  "https://www.getdigitalinfluence.com/team-di#:~:text=Sam%20Newbold"
+];
+
+const resolvedType = pageTypeMap[Astro.url.pathname] ?? "WebPage";
+
+// Astro.site may be a URL object in some versions, so coerce to string first.
+const siteString = typeof Astro.site === "string" ? Astro.site : Astro.site.toString();
+const siteBase = siteString.endsWith("/") ? siteString : siteString + "/";
+const personId = `${siteBase}#person`;
+const websiteId = `${siteBase}#website`;
+const breadcrumbId = `${siteBase}#breadcrumb`;
+const pageId = `${canonicalURL}#webpage`;
+
+const personNode = {
+  "@type": "Person",
+  "@id": personId,
+  name: "Sam Newbold",
+  alternateName: "Sam",
+  jobTitle: "Digital Marketer & AI Implementor",
+  worksFor: [
+    {
+      "@type": "Organization",
+      name: "Digital Influence",
+      url: "https://www.getdigitalinfluence.com",
+    },
+    {
+      "@type": "LocalBusiness",
+      name: "Digital Influence",
+      url: "https://www.getdigitalinfluence.com",
+    },
+  ],
+  image: {
+    "@type": "ImageObject",
+    "@id": new URL("/avatar.jpg", siteBase).toString(),
+    url: new URL("/avatar.jpg", siteBase).toString(),
+    width: 600,
+    height: 600,
+  },
+  sameAs: webProfiles,
+  url: new URL("/about", siteBase).toString(),
+};
+
+const websiteNode = {
+  "@type": "WebSite",
+  "@id": websiteId,
+  url: siteBase,
+  name: "Sam Newbold",
+  description:
+    "AI & Digital Marketing blog, tutorials and tools by Sam Newbold.",
+  inLanguage: "en-NZ",
+  publisher: { "@id": personId },
+  copyrightHolder: { "@id": personId },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${siteBase}search?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const pageNode = {
+  "@type": resolvedType,
+  "@id": pageId,
+  url: canonicalURL,
+  name: makeTitle,
+  isPartOf: { "@id": websiteId },
+  about: { "@id": websiteId },
+  primaryImageOfPage: {
+    "@id": new URL("/opengraph.jpg", siteBase).toString(),
+  },
+  inLanguage: "en-NZ",
+  dateModified: new Date().toISOString(),
+};
+
+const graphNodes = [websiteNode, personNode, pageNode];
+
+/* Breadcrumb only for the homepage */
+if (Astro.url.pathname === "/") {
+  graphNodes.push({
+    "@type": "BreadcrumbList",
+    "@id": breadcrumbId,
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteBase,
+      },
+    ],
+  });
+}
+
+const defaultSchema = {
+  "@context": "https://schema.org",
+  "@graph": graphNodes,
+};
+
+const schemaItem = schema ?? defaultSchema;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" sizes="any" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- <link rel="preload" as="image" href={src} alt="Hero" /> -->
+    <SEO
+      title={makeTitle}
+      description="Explore practical guides on AI in marketing, SEO best practices, and growth tactics written by Sam Newbold, a local growth expert."
+      canonical={canonicalURL}
+      twitter={{
+        creator: "@samnewbold",
+        site: "@samnewbold",
+        card: "summary_large_image",
+      }}
+      openGraph={{
+        basic: {
+          url: canonicalURL,
+          type: "website",
+          title: makeTitle,
+          image: resolvedImageWithDomain,
+        },
+        image: {
+          alt: "Marketing & AI – Tips & Tricks",
+        },
+      }}
+    />
+
+    <SchemaLD item={schemaItem} />
+  </head>
+  <body>
+    <Navbar />
+    <slot />
+    <Footer />
+    <style is:global>
+      /* Improve Page speed */
+      /* https://css-tricks.com/almanac/properties/c/content-visibility/ */
+      img {
+        content-visibility: auto;
+      }
+    </style>
+  </body>
+</html>

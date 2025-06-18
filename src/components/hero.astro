@@ -1,0 +1,39 @@
+---
+import { Picture } from "astro:assets";
+import heroImage from "@/assets/Sam Newbold.jpg";
+import Link from "@/components/ui/link.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<main
+  class="grid lg:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24">
+  <div class="py-6 md:order-1 hidden md:block">
+    <Picture src={heroImage} alt="Sam Newbold portrait" class="w-150 h-auto rounded-lg" />
+  </div>
+  <div>
+    <h1
+      class="text-4xl lg:text-5xl xl:text-6xl font-bold lg:tracking-tight xl:tracking-tighter">
+      AI and Digital Marketing Insights for New Zealand Marketers
+    </h1>
+    <p class="text-lg mt-4 text-slate-600 max-w-xl">
+      Explore practical guides on AI in marketing, SEO best practices, and growth tactics written by Sam Newbold, a local growth expert.
+    </p>
+    <div class="mt-8 flex flex-col sm:flex-row gap-3">
+      <Link
+        size="lg"
+        href="/signup"
+        class="flex gap-1 items-center justify-center">
+        <Icon class="text-white w-5 h-5" name="bx:party" />
+        Newsletter Signup
+      </Link>
+      <Link
+        size="lg"
+        style="outline"
+        href="/contact"
+        class="flex gap-1 items-center justify-center">
+        <Icon class="text-black w-4 h-4" name="bx:paper-plane" />
+        Contact
+      </Link>
+    </div>
+  </div>
+</main>

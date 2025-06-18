@@ -1,0 +1,161 @@
+---
+import { getCollection } from "astro:content";
+import { Picture } from "astro:assets";
+import Layout from "@/layouts/Layout.astro";
+import Container from "@/components/container.astro";
+import Sectionhead from "@/components/sectionhead.astro";
+
+// Filter blog entries with 'draft: false' & date before current date
+const publishedBlogEntries = await getCollection("blog", ({ data }) => {
+  return !data.draft && data.publishDate < new Date();
+});
+
+// Sort content entries by publication date
+publishedBlogEntries.sort(function (a, b) {
+  return b.data.publishDate.valueOf() - a.data.publishDate.valueOf();
+});
+
+// Collect unique categories for the filter dropdown
+const categories = [...new Set(publishedBlogEntries.map((entry) => entry.data.category))];
+---
+
+<Layout title="Blog">
+  <Container>
+    <Sectionhead>
+      <Fragment slot="title">Marketing & AI Blog</Fragment>
+      <Fragment slot="desc">Learn about the latest news, the latest tech and real world strategies so you can improve your marketing and your business.</Fragment>
+    </Sectionhead>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mt-12 max-w-7xl mx-auto">
+      <input
+        id="search"
+        type="text"
+        placeholder="Search blog..."
+        class="border px-4 py-2 rounded w-full md:w-1/2"
+      />
+      <select id="category" class="border px-4 py-2 rounded w-full md:w-auto">
+        <option value="all">All Categories</option>
+        {
+          categories.map((cat) => (
+            <option value={cat}>{cat}</option>
+          ))
+        }
+      </select>
+    </div>
+    <main class="mt-16">
+      <ul class="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto">
+        {
+          publishedBlogEntries.map((blogPostEntry, index) => (
+            <li data-post data-title={blogPostEntry.data.title.toLowerCase()} data-category={blogPostEntry.data.category}>
+              <a href={`/blog/${blogPostEntry.slug}`}>
+                <div>
+                  <Picture
+                    src={blogPostEntry.data.image.src}
+                    alt={blogPostEntry.data.image.alt}
+                    sizes="(max-width: 800px) 100vw, 800px"
+                    width={800}
+                    height={600}
+                    loading={index <= 2 ? "eager" : "lazy"}
+                    decoding={index <= 2 ? "sync" : "async"}
+                    class="w-full rounded-md object-cover"
+                  />
+                  <div class="mt-4">
+                    <span class="text-blue-400 uppercase tracking-wider text-xs font-medium">
+                      {blogPostEntry.data.category}
+                    </span>
+
+                    <h2 class="text-xl font-semibold leading-snug tracking-tight mt-1">
+                      {blogPostEntry.data.title}
+                    </h2>
+
+                    <div class="flex gap-2 mt-3 text-sm">
+                      <span class="text-gray-400">
+                        {blogPostEntry.data.author}
+                      </span>
+                      <span class="text-gray-400">• </span>
+                      <time
+                        class="text-gray-400"
+                        datetime={blogPostEntry.data.publishDate.toISOString()}>
+                        {blogPostEntry.data.publishDate.toDateString()}
+                      </time>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div id="pagination" class="flex justify-center gap-4 mt-12">
+        <button id="prev" class="px-4 py-2 border rounded text-gray-500 disabled:opacity-50" disabled>← Prev</button>
+        <button id="next" class="px-4 py-2 border rounded text-gray-500 disabled:opacity-50">Next →</button>
+      </div>
+    </main>
+  </Container>
+  <script is:inline>
+    const searchInput = document.getElementById("search");
+    const categorySelect = document.getElementById("category");
+    const posts = Array.from(document.querySelectorAll("[data-post]"));
+    const prevBtn = document.getElementById("prev");
+    const nextBtn = document.getElementById("next");
+
+    const PER_PAGE = 8;
+    let currentPage = 1;
+
+    function getFilteredPosts() {
+      const query = searchInput.value.toLowerCase();
+      const cat = categorySelect.value;
+      return posts.filter((item) => {
+        const title = item.getAttribute("data-title");
+        const category = item.getAttribute("data-category");
+        const matchesQuery = title.includes(query);
+        const matchesCat = cat === "all" || category === cat;
+        return matchesQuery && matchesCat;
+      });
+    }
+
+    function render() {
+      const visiblePosts = getFilteredPosts();
+      const totalPages = Math.max(1, Math.ceil(visiblePosts.length / PER_PAGE));
+
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      // Hide all
+      posts.forEach((p) => (p.style.display = "none"));
+
+      // Show current slice
+      const start = (currentPage - 1) * PER_PAGE;
+      const end = start + PER_PAGE;
+      visiblePosts.slice(start, end).forEach((p) => (p.style.display = ""));
+
+      // Pagination button states
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages;
+    }
+
+    searchInput.addEventListener("input", () => {
+      currentPage = 1;
+      render();
+    });
+    categorySelect.addEventListener("change", () => {
+      currentPage = 1;
+      render();
+    });
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        render();
+      }
+    });
+    nextBtn.addEventListener("click", () => {
+      const visiblePosts = getFilteredPosts();
+      const totalPages = Math.ceil(visiblePosts.length / PER_PAGE);
+      if (currentPage < totalPages) {
+        currentPage++;
+        render();
+      }
+    });
+
+    // Initial render
+    render();
+  </script>
+</Layout>

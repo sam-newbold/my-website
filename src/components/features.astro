@@ -1,0 +1,68 @@
+---
+// @ts-ignore
+import { Icon } from "astro-icon/components";
+
+const features = [
+  {
+    title: "AI in Business Explained",
+    description:
+      "Understand how machine learning predicts customer behaviour, uncovers growth levers, and streamlines decisions. Each article breaks down real‑world use cases so you can apply AI without a data‑science degree.",
+    icon: "bx:bxs-briefcase",
+  },
+  {
+    title: "Marketing Automations That Convert",
+    description:
+      "Follow tutorials on email sequencing, chatbot journeys, and lead‑scoring playbooks. Step‑by‑step guides help you replace repetitive tasks with automated workflows that nurture prospects around the clock.",
+    icon: "bx:bxs-window-alt",
+  },
+  {
+    title: "Essential Web Tools and Workflows",
+    description:
+      "Get reviews and walkthroughs on CMS platforms, analytics dashboards, and no‑code integrations. Learn which tools speed up content production, measure performance accurately, and scale with your traffic.",
+    icon: "bx:bxs-data",
+  },
+  {
+    title: "SEO and LLMEO Deep Dives",
+    description:
+      "Master technical SEO, schema, and topical clustering, then level up with Large Language Model Engine Optimisation. Discover how to make your content discoverable by search engines and AI answer boxes alike.",
+    icon: "bx:bxs-file-find",
+  },
+  {
+    title: "Social and Google Ads Playbooks",
+    description:
+      "See tested strategies for Meta, LinkedIn, and Google Ads campaigns. From keyword research and creative generation to AI‑driven bidding, you will find tactics that lower costs and boost return on ad spend.",
+    icon: "bx:bxs-bot",
+  },
+  {
+    title: "Community Insights and Resources",
+    description:
+      "Join a growing network of marketers sharing prompt libraries, automation templates, and success stories. Weekly roundups keep you informed, inspired, and ready to implement the latest digital trends.",
+    icon: "bx:bxs-user",
+  },
+];
+---
+
+<div class="mt-16 md:mt-0">
+  <h2 class="text-4xl lg:text-5xl font-bold lg:tracking-tight">
+    Everything you need to keep up with digital marketing and AI innovations.
+  </h2>
+  <p class="text-lg mt-4 text-slate-600">
+    Sign up to the newsletter to ensure you don't miss any of the news!
+  </p>
+</div>
+
+<div class="grid sm:grid-cols-2 md:grid-cols-3 mt-16 gap-16">
+  {
+    features.map((item) => (
+      <div class="flex gap-4 items-start">
+        <div class="mt-1 bg-black rounded-full  p-2 w-8 h-8 shrink-0">
+          <Icon class="text-white" name={item.icon} />
+        </div>
+        <div>
+          <h3 class="font-semibold text-lg">{item.title}</h3>{" "}
+          <p class="text-slate-500 mt-2 leading-relaxed">{item.description}</p>
+        </div>
+      </div>
+    ))
+  }
+</div>
